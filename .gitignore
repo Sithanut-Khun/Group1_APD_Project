@@ -12,4 +12,4 @@ uploads/
 
 *.yml
 *Dockerfile
-/backend/app/database.py
+

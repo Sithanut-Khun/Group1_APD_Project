@@ -11,6 +11,7 @@ import os
 import numpy as np
 from datetime import datetime
 import tempfile  #
+from pathlib import Path
 
 from .database import get_db, engine
 from .models import Base, Prediction
@@ -32,8 +33,35 @@ app.add_middleware(
 Base.metadata.create_all(bind=engine)
 
 # Load YOLO model
+# print("Loading YOLOv8 model...")
+# model = YOLO('yolov8n-pose.pt')
+# print("Model loaded successfully!")
 print("Loading YOLOv8 model...")
-model = YOLO('yolov8n-pose.pt')
+
+# Define the path where you want the model
+MODELS_DIR = Path(__file__).parent / "models"  # backend/app/models/
+MODEL_PATH = MODELS_DIR / "yolov8n-pose.pt"
+
+# Create models directory if it doesn't exist
+MODELS_DIR.mkdir(exist_ok=True)
+
+print(f"Looking for model at: {MODEL_PATH}")
+
+if MODEL_PATH.exists():
+    # Load from local file
+    model = YOLO(str(MODEL_PATH))
+    print("✓ Model loaded from local file")
+else:
+    # Download and save to our models directory
+    print("Model not found locally, downloading...")
+    
+    # Download the model (this will temporarily save to current dir)
+    model = YOLO('yolov8n-pose.pt')
+    
+    # Save it to our desired location
+    model.save(str(MODEL_PATH))
+    print(f"✓ Model downloaded and saved to: {MODEL_PATH}")
+
 print("Model loaded successfully!")
 
 @app.get("/")
@@ -46,8 +74,7 @@ def root():
         "endpoints": {
             "health": "/health",
             "predict": "/predict",
-            "history": "/history",
-            "stats": "/stats"
+            "history": "/history"
         }
     }
 
@@ -162,8 +189,6 @@ async def predict(file: UploadFile = File(...), db: Session = Depends(get_db)):
         # 1. Get the total number of people detected
         total_persons = len(results[0].keypoints)
         
-        # 2. Still pick the first person for Activity Classification 
-        # (To support 5 different activities, you'd need a major database change)
         keypoints = results[0].keypoints[0]
         # --- NEW CODE END ---
         
