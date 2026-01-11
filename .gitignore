@@ -10,6 +10,8 @@ __pycache__/
 uploads/
 *.log
 
+*.csv
+
 *.yml
 *Dockerfile
 

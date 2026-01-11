@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from .config import settings
+from .core.config import settings
 
 print(f"🔧 Using database: {settings.DB_NAME}")
 
