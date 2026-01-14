@@ -1,16 +1,17 @@
 import uuid
+import io
+import os
+import tempfile
+from typing import List
+from pathlib import Path
+
 from fastapi import FastAPI, UploadFile, File, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-from ultralytics import YOLO
 from PIL import Image
-import io
-from typing import List
-import os
 import numpy as np
-from datetime import datetime
-import tempfile  #
+import torch
+from transformers import VideoMAEImageProcessor, VideoMAEForVideoClassification
 
 from .database import get_db, engine
 from .models import Base, Prediction
@@ -31,154 +32,122 @@ app.add_middleware(
 # Create DB tables
 Base.metadata.create_all(bind=engine)
 
-# Load YOLO model
-print("Loading YOLOv8 model...")
-model = YOLO('yolov8n-pose.pt')
-print("Model loaded successfully!")
+# Load VideoMAE model
+print("Loading VideoMAE model...")
+MODEL_NAME = "MCG-NJU/videomae-base-finetuned-kinetics"
+
+try:
+    processor = VideoMAEImageProcessor.from_pretrained(MODEL_NAME)
+    model = VideoMAEForVideoClassification.from_pretrained(MODEL_NAME)
+    model.eval()
+    
+    # Move to GPU if available
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = model.to(device)
+    print(f"✓ VideoMAE model loaded successfully on {device}")
+except Exception as e:
+    print(f"Error loading VideoMAE: {e}")
+    raise
+
+# Action mapping for better display names
+ACTION_MAPPING = {
+    "walking": "Walking",
+    "running": "Running",
+    "jumping": "Jumping",
+    "sitting": "Sitting",
+    "standing": "Standing",
+    "waving": "Waving",
+    "clapping": "Clapping",
+    "dancing": "Dancing",
+}
 
 @app.get("/")
 def root():
     """Root endpoint"""
     return {
-        "message": "NeuralPose API",
-        "version": "1.0.0",
+        "message": "NeuralPose API - VideoMAE",
+        "version": "2.0.0",
         "status": "running",
+        "model": "VideoMAE-base-kinetics",
         "endpoints": {
             "health": "/health",
             "predict": "/predict",
+            "predict_video": "/predict/video",
             "history": "/history",
-            "stats": "/stats"
+            "actions": "/actions"
         }
     }
 
 @app.get("/health")
 def health_check():
     """Health check endpoint"""
-    return {"status": "healthy", "model": "yolov8n-pose"}
+    return {
+        "status": "healthy",
+        "model": "VideoMAE-base-kinetics",
+        "device": str(device)
+    }
 
 
-def classify_activity(keypoints_xy, keypoints_conf, img_width, img_height):
+def preprocess_image_for_video(image: Image.Image, num_frames: int = 16):
     """
-    Improved activity classification with corrected priority order.
+    Convert single image to video-like format by duplicating frames.
+    VideoMAE expects 16 frames by default.
     """
-    # COCO keypoint indices
-    NOSE = 0
-    LEFT_SHOULDER, RIGHT_SHOULDER = 5, 6
-    LEFT_ELBOW, RIGHT_ELBOW = 7, 8
-    LEFT_WRIST, RIGHT_WRIST = 9, 10
-    LEFT_HIP, RIGHT_HIP = 11, 12
-    LEFT_KNEE, RIGHT_KNEE = 13, 14
-    LEFT_ANKLE, RIGHT_ANKLE = 15, 16
-    
-    # Helper to get point if confidence > 0.5
-    def get_point(idx):
-        if keypoints_conf[idx] > 0.5:
-            return keypoints_xy[idx]
-        return None
-    
-    # Extract points
-    l_hip, r_hip = get_point(LEFT_HIP), get_point(RIGHT_HIP)
-    l_knee, r_knee = get_point(LEFT_KNEE), get_point(RIGHT_KNEE)
-    l_ankle, r_ankle = get_point(LEFT_ANKLE), get_point(RIGHT_ANKLE)
-    l_wrist, r_wrist = get_point(LEFT_WRIST), get_point(RIGHT_WRIST)
-    l_shoulder, r_shoulder = get_point(LEFT_SHOULDER), get_point(RIGHT_SHOULDER)
-    nose = get_point(NOSE)
+    image = image.convert("RGB")
+    frames = [image] * num_frames
+    return frames
 
-    # Calculate averages (safe calculation)
-    def avg_y(p1, p2):
-        if p1 is not None and p2 is not None:
-            return (p1[1] + p2[1]) / 2
-        return p1[1] if p1 is not None else (p2[1] if p2 is not None else None)
 
-    avg_hip_y = avg_y(l_hip, r_hip)
-    avg_knee_y = avg_y(l_knee, r_knee)
-    avg_ankle_y = avg_y(l_ankle, r_ankle)
-    
-    # Base Confidence
-    visible_points = [p for p in [l_hip, r_hip, l_knee, r_knee, l_ankle, r_ankle] if p is not None]
-    if len(visible_points) < 3:
-        return "Unknown Pose", 0.0
-    confidence = np.mean([keypoints_conf[i] for i in range(17) if keypoints_conf[i] > 0.5])
-
-    # --- PRIORITY 1: Dynamic Actions (Running/Walking) ---
-    # Check this BEFORE standing. 
-    # Logic: Large vertical separation between knees (lifting leg) OR large horizontal separation (stride)
-    if l_knee is not None and r_knee is not None:
-        knee_dist_y = abs(l_knee[1] - r_knee[1])
-        knee_dist_x = abs(l_knee[0] - r_knee[0])
+def predict_action(frames: List[Image.Image]) -> tuple:
+    """
+    Predict action using VideoMAE model.
+    Returns: (action_name, confidence)
+    """
+    try:
+        # Preprocess frames
+        inputs = processor(frames, return_tensors="pt")
+        inputs = {k: v.to(device) for k, v in inputs.items()}
         
-        # If knees are far apart vertically (high stepping) or horizontally (wide stride)
-        if knee_dist_y > 0.08 * img_height or knee_dist_x > 0.20 * img_width:
-            # Distinguish Run vs Walk based on severity of split
-            if knee_dist_y > 0.12 * img_height or knee_dist_x > 0.35 * img_width:
-                return "Running", confidence * 0.95
-            return "Walking", confidence * 0.90
+        # Run inference
+        with torch.no_grad():
+            outputs = model(**inputs)
+            logits = outputs.logits
+        
+        # Get predictions
+        predicted_class_idx = logits.argmax(-1).item()
+        probabilities = torch.nn.functional.softmax(logits, dim=-1)
+        confidence = probabilities[0][predicted_class_idx].item()
+        
+        # Get action label
+        action_label = model.config.id2label[predicted_class_idx]
+        
+        # Clean up action name
+        action_name = ACTION_MAPPING.get(action_label.lower(), action_label.title())
+        
+        return action_name, confidence
+        
+    except Exception as e:
+        print(f"Error in prediction: {e}")
+        return "Unknown", 0.0
 
-
-    # --- PRIORITY 3: Jumping ---
-    # Logic: Ankles are significantly higher than bottom of image (or relative to body size)
-    # This is tricky without a ground reference, but we can check if legs are tucked up
-    if avg_ankle_y is not None and avg_knee_y is not None:
-        if avg_ankle_y < avg_knee_y: # Feet above knees (tucked jump)
-            return "Jumping", confidence * 0.9
-
-    # --- PRIORITY 4: Sitting ---
-    if avg_hip_y is not None and avg_knee_y is not None:
-        # Thighs are roughly horizontal (knees and hips at similar Y)
-        if abs(avg_hip_y - avg_knee_y) < 0.1 * img_height:
-             return "Sitting", confidence * 0.92
-
-    # --- PRIORITY 5: Waving (Upper Body) ---
-    if l_wrist is not None and l_shoulder is not None:
-        if l_wrist[1] < l_shoulder[1]: # Wrist above shoulder
-            return "Waving", confidence * 0.9
-    if r_wrist is not None and r_shoulder is not None:
-        if r_wrist[1] < r_shoulder[1]:
-            return "Waving", confidence * 0.9
-
-    # --- PRIORITY 7: Standing (Default Upright) ---
-    # Only if none of the above matched
-    if avg_hip_y is not None and avg_knee_y is not None and avg_ankle_y is not None:
-        if avg_hip_y < avg_knee_y < avg_ankle_y:
-            return "Standing", confidence * 0.90
-
-    return "Unknown Pose", confidence * 0.5
 
 @app.post("/predict", response_model=PredictionOut)
-async def predict(file: UploadFile = File(...), db: Session = Depends(get_db)):
+async def predict_single_image(file: UploadFile = File(...), db: Session = Depends(get_db)):
+    """
+    Predict action from a single image.
+    Note: VideoMAE works best with video, so this duplicates the frame.
+    """
     try:
         contents = await file.read()
         image = Image.open(io.BytesIO(contents))
         img_width, img_height = image.size
         
-        # Run YOLO inference
-        results = model(image, conf=0.25)
+        # Convert single image to video format (duplicate frames)
+        frames = preprocess_image_for_video(image, num_frames=16)
         
-        # Extract keypoints (first person only)
-        if len(results) == 0 or len(results[0].keypoints) == 0:
-            raise ValueError("No person detected")
+        # Predict action
+        activity, confidence = predict_action(frames)
         
-        # --- NEW CODE START ---
-        # 1. Get the total number of people detected
-        total_persons = len(results[0].keypoints)
-        
-        # 2. Still pick the first person for Activity Classification 
-        # (To support 5 different activities, you'd need a major database change)
-        keypoints = results[0].keypoints[0]
-        # --- NEW CODE END ---
-        
-        keypoints = results[0].keypoints[0]
-        
-        # --- FIXED SECTION START ---
-        # accessing .xy usually returns shape (1, 17, 2), so we need [0] to get (17, 2)
-        keypoints_xy = keypoints.xy.numpy()[0] 
-        
-        # conf is usually (1, 17), flattening it works, but [0] is cleaner
-        keypoints_conf = keypoints.conf.numpy()[0] 
-        # --- FIXED SECTION END ---
-
-        # Classify activity
-        activity, confidence = classify_activity(keypoints_xy, keypoints_conf, img_width, img_height)
         # Save image
         temp_dir = tempfile.gettempdir()
         filename = f"{uuid.uuid4()}.jpg"
@@ -188,11 +157,12 @@ async def predict(file: UploadFile = File(...), db: Session = Depends(get_db)):
             f.write(contents)
         
         # Save to DB
-        pred_in = PredictionCreate(input_data=filename, prediction=activity, confidence=confidence)
+        pred_in = PredictionCreate(
+            input_data=filename,
+            prediction=activity,
+            confidence=confidence
+        )
         pred = create_prediction(db=db, prediction=pred_in)
-        
-        # Normalize keypoints for frontend (0-1)
-        norm_keypoints = [[float(x) / img_width, float(y) / img_height] for x, y in keypoints_xy]
         
         print(f"✅ Prediction: {activity} ({confidence*100:.1f}%)")
         
@@ -202,8 +172,8 @@ async def predict(file: UploadFile = File(...), db: Session = Depends(get_db)):
             prediction=pred.prediction,
             confidence=pred.confidence,
             created_at=pred.created_at,
-            keypoints=norm_keypoints,
-            person_count=total_persons
+            keypoints=[],  # VideoMAE doesn't provide keypoints
+            person_count=1
         )
         
     except Exception as e:
@@ -212,6 +182,84 @@ async def predict(file: UploadFile = File(...), db: Session = Depends(get_db)):
         print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Prediction error: {str(e)}")
 
+
+@app.post("/predict/video")
+async def predict_video(file: UploadFile = File(...), db: Session = Depends(get_db)):
+    """
+    Predict action from a video file.
+    """
+    try:
+        import cv2
+        
+        contents = await file.read()
+        
+        # Save temporary video file
+        temp_dir = tempfile.gettempdir()
+        video_filename = f"{uuid.uuid4()}.mp4"
+        video_path = os.path.join(temp_dir, video_filename)
+        
+        with open(video_path, "wb") as f:
+            f.write(contents)
+        
+        # Extract frames from video
+        cap = cv2.VideoCapture(video_path)
+        frames = []
+        frame_count = 0
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        
+        # Sample 16 frames evenly
+        frame_indices = np.linspace(0, total_frames - 1, 16, dtype=int)
+        
+        while cap.isOpened() and len(frames) < 16:
+            ret, frame = cap.read()
+            if not ret:
+                break
+                
+            if frame_count in frame_indices:
+                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                pil_image = Image.fromarray(frame_rgb)
+                frames.append(pil_image)
+            
+            frame_count += 1
+        
+        cap.release()
+        
+        # If not enough frames, duplicate last one
+        while len(frames) < 16:
+            frames.append(frames[-1] if frames else Image.new('RGB', (224, 224)))
+        
+        # Predict action
+        activity, confidence = predict_action(frames[:16])
+        
+        # Save to DB
+        pred_in = PredictionCreate(
+            input_data=video_filename,
+            prediction=activity,
+            confidence=confidence
+        )
+        pred = create_prediction(db=db, prediction=pred_in)
+        
+        print(f"✅ Video Prediction: {activity} ({confidence*100:.1f}%)")
+        
+        return {
+            "id": pred.id,
+            "input_data": pred.input_data,
+            "prediction": pred.prediction,
+            "confidence": pred.confidence,
+            "created_at": pred.created_at,
+            "frames_analyzed": len(frames)
+        }
+        
+    except Exception as e:
+        import traceback
+        print("ERROR in /predict/video:")
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Video prediction error: {str(e)}")
+    finally:
+        if os.path.exists(video_path):
+            os.remove(video_path)
+
+
 @app.get("/history", response_model=List[PredictionHistory])
 def get_history(limit: int = 50, db: Session = Depends(get_db)):
     """Get prediction history"""
@@ -219,4 +267,11 @@ def get_history(limit: int = 50, db: Session = Depends(get_db)):
     return predictions[-limit:]
 
 
-
+@app.get("/actions")
+def get_available_actions():
+    """Get list of actions the model can recognize"""
+    return {
+        "total_actions": len(model.config.id2label),
+        "sample_actions": list(model.config.id2label.values())[:20],
+        "note": "Model trained on Kinetics-400 dataset with 400 action classes"
+    }
