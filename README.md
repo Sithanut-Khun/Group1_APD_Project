@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ML multiclass- classification service
 
 ## About the project
@@ -265,3 +266,6 @@ by checking: http://0.0.0.0:8000/api/stats/
 
 Other functionalities defined in Makefile include e.g. code reformatting using black and isort.
 
+=======
+Group-1 APD
+>>>>>>> origin/main

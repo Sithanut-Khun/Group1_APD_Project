@@ -1,0 +1,17 @@
+# .gitignore
+.venv
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+*.pyc
+__pycache__/
+uploads/
+*.log
+
+*.csv
+
+*.yml
+*Dockerfile
+
