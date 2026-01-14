@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuralPose - Activity Recognition</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="header glass">
+        <div class="logo">
+            <i class="fas fa-brain"></i>
+            <span>NeuralPose</span>
+        </div>
+        <div class="processing-status">
+            <div class="processing-indicator" id="processingIndicator"></div>
+            <span id="status">Ready</span>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <!-- Input Selection -->
+            <section class="sidebar-section glass">
+                <h3 class="section-title">
+                    <i class="fas fa-upload"></i>
+                    Input Source
+                </h3>
+                <div class="input-methods">
+                    <div class="input-method" data-input="video">
+                        <i class="fas fa-video"></i>
+                        <span>Upload Video</span>
+                    </div>
+                    <div class="input-method" data-input="image">
+                        <i class="fas fa-image"></i>
+                        <span>Upload Image</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Controls -->
+            <section class="sidebar-section glass">
+                <h3 class="section-title">
+                    <i class="fas fa-sliders-h"></i>
+                    Controls
+                </h3>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="startBtn">
+                        <i class="fas fa-play"></i> Start Processing
+                    </button>
+                    <button class="btn btn-secondary" id="resetBtn">
+                        <i class="fas fa-sync-alt"></i> Reset
+                    </button>
+                </div>
+            </section>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <section class="results-section glass">
+                <div class="results-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-chart-line"></i>
+                        Live Results
+                    </h2>
+                    <div class="pose-label" id="poseLabel">Select input & start processing</div>
+                </div>
+                <div class="visualization-area">
+                    <video class="webcam-video" id="webcam" autoplay playsinline style="display: none;"></video>
+                    <img id="imageDisplay" style="display: none; width: 100%; height: 100%; object-fit: contain; background: #000;">
+                    <div class="placeholder-text" id="placeholder">No input loaded</div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Right Panel -->
+        <aside class="right-panel">
+            <!-- Metrics -->
+            <section class="metrics-panel glass">
+                <h3 class="section-title">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Metrics
+                </h3>
+                <div class="metric-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="fpsMetric">0.0</div>
+                        <div class="metric-label">FPS</div>
+                    </div>
+                   <div class="metric-card">
+                        <div class="metric-value" id="confidenceMetric">0.0%</div>
+                        <div class="metric-label">Confidence</div>  
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="latencyMetric">0ms</div>
+                        <div class="metric-label">Latency</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="personsMetric">0</div>
+                        <div class="metric-label">Persons</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Activity Detection -->
+            <section class="activity-panel glass">
+                <h3 class="section-title">
+                    <i class="fas fa-running"></i>
+                    Detected Activities
+                </h3>
+                <div class="activity-list" id="activityList">
+                    <div class="activity-placeholder">No activities detected</div>
+                </div>
+            </section>
+        </aside>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="js/config.js"></script>
+    <script src="js/metrics.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
