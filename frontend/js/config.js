@@ -2,7 +2,7 @@
 
 // API Configuration
 const API_CONFIG = {
-    BASE_URL: 'http://localhost:8000',
+    BASE_URL: '/api',
     ENDPOINTS: {
         PREDICT: '/predict',
         HEALTH: '/health',
