@@ -48,6 +48,7 @@ services:
     container_name: frontend_web
     volumes:
       - ./frontend:/usr/share/nginx/html:ro
+      - ./frontend/default.conf.template:/etc/nginx/templates/default.conf.template
     ports:
       - "80:80"
     depends_on:

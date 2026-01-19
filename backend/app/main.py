@@ -6,7 +6,7 @@ from .database import engine
 from .models import Base
 from .routers import pose, history 
 
-app = FastAPI()
+app = FastAPI(root_path="/api")
 
 # CORS for frontend
 app.add_middleware(
