@@ -2,7 +2,7 @@
 
 // API Configuration
 const API_CONFIG = {
-    BASE_URL: 'http://api.pose.ams.cards',
+    BASE_URL: 'http://localhost:8000',
     ENDPOINTS: {
         PREDICT: '/predict',
         HEALTH: '/health',
