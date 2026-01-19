@@ -9,4 +9,7 @@ class Prediction(Base):
     input_data = Column(String)
     prediction = Column(String)
     confidence = Column(Float)
+    person_count = Column(Integer, default=0)
+    fps = Column(Float, default=0.0)
+    latency = Column(Float, default=0.0)
     created_at = Column(DateTime, default=datetime.utcnow)

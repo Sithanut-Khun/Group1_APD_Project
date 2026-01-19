@@ -6,10 +6,9 @@ from .core.config import settings
 
 print(f"🔧 Using database: {settings.DB_NAME}")
 
-# Try both URL formats
 SQLALCHEMY_DATABASE_URLS = [
-    settings.DATABASE_URL,      # URL encoded
-    settings.DATABASE_URL_RAW,  # Raw (no encoding)
+    settings.DATABASE_URL,      
+    settings.DATABASE_URL_RAW,  
 ]
 
 engine = None
@@ -22,14 +21,13 @@ for i, db_url in enumerate(SQLALCHEMY_DATABASE_URLS):
         
         engine = create_engine(db_url)
         
-        # Test connection with text() wrapper
+        
         with engine.connect() as conn:
-            # Test 1: Check PostgreSQL version
+           
             result = conn.execute(text("SELECT version();"))
             version = result.fetchone()[0]
             print(f"   ✅ PostgreSQL: {version.split(',')[0]}")
             
-            # Test 2: Check if our database exists
             result = conn.execute(text("SELECT datname FROM pg_database WHERE datname = :db_name"), 
                                  {"db_name": settings.DB_NAME})
             db_exists = result.fetchone() is not None

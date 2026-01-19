@@ -1,20 +1,19 @@
-# backend/app/config.py
+# backend/app/core/config.py
 import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Get the project root path
-BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
-# Load environment variables from .env file
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent  
 env_path = BASE_DIR / '.env'
+
 if env_path.exists():
     load_dotenv(dotenv_path=env_path)
+    print(f"✓ Loaded .env from: {env_path}")
 else:
-    raise FileNotFoundError(f".env file not found at {env_path}")
+    print("⚠️  No .env file found - using environment variables from Docker")
 
 class Settings:
-    # Database
     DB_HOST: str = os.getenv("DB_HOST", "localhost")
     DB_PORT: str = os.getenv("DB_PORT", "5432")
     DB_USER: str = os.getenv("DB_USER", "postgres")
@@ -55,5 +54,5 @@ try:
     settings.validate()
 except ValueError as e:
     print(f"❌ Configuration error: {e}")
-    print(f"   Please check your .env file at: {env_path}")
+    print(f"   Environment variables needed: DB_HOST, DB_USER, DB_PASSWORD, DB_NAME")
     raise

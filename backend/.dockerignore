@@ -1,7 +1,42 @@
-.git
-.venv
+# Python
 __pycache__
-*.pyc
-.env
-uploads/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ML models (we don't need YOLO weights anymore)
+*.pt
+*.pth
+*.onnx
+runs/
 ml_research/
+
+# Uploads (use volume instead)
+uploads/*
+
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+
+# Logs
+*.log
+

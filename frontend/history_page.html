@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuralPose - Prediction History</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/history.css">
+</head>
+<body>
+    <!-- Header - EXACT SAME STRUCTURE AS INDEX.HTML -->
+    <div class="header glass">
+        <div class="logo">
+            <i class="fas fa-brain"></i>
+            <span>NeuralPose</span>
+        </div>
+        
+        <!-- Navigation Menu - SAME POSITION AS INDEX -->
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-home"></i> Live Detection
+            </a>
+            <a href="history_page.html" class="nav-link active">
+                <i class="fas fa-history"></i> History
+            </a>
+        </nav>
+        
+        <!-- Processing Status - SAME AS INDEX -->
+        <div class="processing-status">
+            <div class="processing-indicator" id="processingIndicator"></div>
+            <span id="status">Archive Mode</span>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="history-container">
+        <!-- Controls Section -->
+        <section class="controls-section glass">
+            <div class="controls-header">
+                <h2 class="section-title">
+                    <i class="fas fa-filter"></i>
+                    Filters & Actions
+                </h2>
+            </div>
+            <div class="controls-content">
+               <div class="filter-group activity-filter">
+                <label for="activityFilter">Activity Type:</label>
+                <div class="filter-select">
+                    <select id="activityFilter" class="form-select">
+                        <option value="">All Activities</option>
+                        <option value="Standing">Standing</option>
+                        <option value="Walking">Walking</option>
+                        <option value="Running">Running</option>
+                        <option value="Sitting">Sitting</option>
+                        <option value="Jumping">Jumping</option>
+                        <option value="Waving">Waving</option>
+                        <option value="Squatting">Squatting</option>
+                        <option value="Raising Arms">Raising Arms</option>
+                        <option value="Bending Over">Bending Over</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-group limit-filter">
+                <label for="limitFilter">Show Last:</label>
+                <div class="filter-select">
+                    <select id="limitFilter" class="filter-select">
+                        <option value="10">10 Records</option>
+                        <option value="25" selected>25 Records</option>
+                        <option value="50">50 Records</option>
+                        <option value="100">100 Records</option>
+                    </select>
+                </div>
+            </div>
+                <div class="action-buttons-group">
+                    <button class="btn btn-primary" id="refreshBtn">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                    <button class="btn btn-success" id="exportBtn">
+                        <i class="fas fa-download"></i> Export CSV
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Statistics Section -->
+        <section class="stats-section glass">
+            <h2 class="section-title">
+                <i class="fas fa-chart-bar"></i>
+                Statistics Overview
+            </h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-database"></i></div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="totalRecords">0</div>
+                        <div class="stat-label">Total Records</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="avgConfidence">0%</div>
+                        <div class="stat-label">Avg Confidence</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-tachometer-alt"></i></div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="avgFPS">0</div>
+                        <div class="stat-label">Avg FPS</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="avgLatency">0ms</div>
+                        <div class="stat-label">Avg Latency</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- History Table Section -->
+        <section class="table-section glass">
+            <div class="table-header">
+                <h2 class="section-title">
+                    <i class="fas fa-table"></i>
+                    Prediction History
+                </h2>
+                <div class="record-count" id="recordCount">Loading...</div>
+            </div>
+            
+            <div class="table-container">
+                <table class="history-table" id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Timestamp</th>
+                            <th>Activity</th>
+                            <th>Confidence</th>
+                            <th>Persons</th>
+                            <th>FPS</th>
+                            <th>Latency</th>
+                            <th>Image</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr>
+                            <td colspan="8" class="loading-cell">
+                                <i class="fas fa-spinner fa-spin"></i> Loading data...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/config.js"></script>
+    <script src="js/history.js"></script>
+</body>
+</html>

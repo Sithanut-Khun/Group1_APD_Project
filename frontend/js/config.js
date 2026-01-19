@@ -1,10 +1,8 @@
-/* ============================================
-   Configuration & Constants
-   ============================================ */
+
 
 // API Configuration
 const API_CONFIG = {
-    BASE_URL: 'http://127.0.0.1:8000',
+    BASE_URL: 'http://localhost:8000',
     ENDPOINTS: {
         PREDICT: '/predict',
         HEALTH: '/health',
@@ -24,11 +22,11 @@ const SAMPLE_ACTIVITIES = [
 
 // Model configurations
 const MODELS = {
-    'yolov8': {
-        name: 'YOLOv8n Pose',
+    'mediapipe': {
+        name: 'MediaPipe Pose',
         description: 'Activity recognition',
-        fps: 15,
-        accuracy: 0.85
+        fps: 30,
+        accuracy: 0.90
     }
 };
 

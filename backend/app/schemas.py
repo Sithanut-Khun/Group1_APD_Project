@@ -8,14 +8,15 @@ class PredictionBase(BaseModel):
     confidence: float
 
 class PredictionCreate(PredictionBase):
-    pass
+    person_count: int = 0
+    fps: float = 0.0
+    latency: float = 0.0
 
 class PredictionOut(PredictionBase):
     id: int
     created_at: datetime
     person_count: int
     keypoints: List[List[float]]
-    
 
     class Config:
         from_attributes = True
@@ -25,9 +26,10 @@ class PredictionHistory(BaseModel):
     input_data: str
     prediction: str
     confidence: float
+    person_count: int = 0
+    fps: float = 0.0
+    latency: float = 0.0
     created_at: datetime
 
     class Config:
         from_attributes = True
-        
-        
