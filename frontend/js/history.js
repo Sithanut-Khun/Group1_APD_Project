@@ -126,6 +126,9 @@ class HistoryManager {
         let fpsClass = 'high';
         if (pred.fps < 15) fpsClass = 'medium';
         if (pred.fps < 10) fpsClass = 'low';
+
+        // PATH to your images - make sure this matches your setup (usually /outputs/ or /static/)
+        const imageUrl = `${API_CONFIG.BASE_URL}/outputs/${pred.input_data}`;
         
         return `
             <tr data-id="${pred.id}">
@@ -148,7 +151,19 @@ class HistoryManager {
                 <td><span class="metric-value">${pred.person_count || 0}</span></td>
                 <td><span class="metric-value ${fpsClass}">${pred.fps ? pred.fps.toFixed(1) : 'N/A'}</span></td>
                 <td><span class="metric-value">${pred.latency ? pred.latency.toFixed(0) + 'ms' : 'N/A'}</span></td>
-                <td><span class="image-filename">${pred.input_data}</span></td>
+                <td>
+                    <div class="image-cell-actions">
+                        <span class="image-filename" title="${pred.original_filename || pred.input_data}">
+                            ${pred.original_filename || 'image.jpg'}
+                        </span>
+                        <a href="${imageUrl}" 
+                        download="${pred.original_filename || 'download.jpg'}" 
+                        class="download-icon-btn" 
+                        title="Download Original File">
+                            <i class="fas fa-file-download"></i>
+                        </a>
+                    </div>
+                </td>
             </tr>
         `;
     }

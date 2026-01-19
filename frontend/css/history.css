@@ -516,6 +516,40 @@
     border-radius: 3px;
 }
 
+
+
+.image-cell-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 150px;
+}
+
+.image-filename {
+    font-size: 0.85rem;
+    color: var(--gray-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}
+
+.download-icon-btn {
+    color: var(--secondary); /* This uses your green success color */
+    font-size: 1.1rem;
+    transition: transform 0.2s, color 0.2s;
+    cursor: pointer;
+}
+
+.download-icon-btn:hover {
+    color: var(--primary);
+    transform: scale(1.2);
+}
+
+
+
+
 /* Metric Values - COLOR CODING */
 .metric-value {
     font-family: 'Courier New', monospace;

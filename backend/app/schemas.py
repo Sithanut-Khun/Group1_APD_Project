@@ -11,7 +11,8 @@ class PredictionCreate(PredictionBase):
     person_count: int = 0
     fps: float = 0.0
     latency: float = 0.0
-
+    original_filename: str 
+    
 class PredictionOut(PredictionBase):
     id: int
     created_at: datetime
@@ -24,6 +25,7 @@ class PredictionOut(PredictionBase):
 class PredictionHistory(BaseModel):
     id: int
     input_data: str
+    original_filename: str
     prediction: str
     confidence: float
     person_count: int = 0

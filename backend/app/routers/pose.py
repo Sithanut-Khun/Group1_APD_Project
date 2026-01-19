@@ -138,6 +138,9 @@ async def predict(file: UploadFile = File(...), db: Session = Depends(get_db)):
     start_time = time.time()
     
     try:
+        # --- NEW: Capture original filename ---
+        original_filename = file.filename 
+        
         # Read uploaded image
         contents = await file.read()
         image = Image.open(io.BytesIO(contents))
@@ -162,7 +165,7 @@ async def predict(file: UploadFile = File(...), db: Session = Depends(get_db)):
         
         # Save temporary image file
         temp_dir = tempfile.gettempdir()
-        filename = f"{uuid.uuid4()}.jpg"
+        filename = f"{uuid.uuid4()}.jpg" # This is our internal hashed name
         filepath = os.path.join(temp_dir, filename)
         with open(filepath, "wb") as f:
             f.write(contents)
@@ -177,22 +180,24 @@ async def predict(file: UploadFile = File(...), db: Session = Depends(get_db)):
         
         # Save prediction to database with extended fields
         pred_in = PredictionCreate(
-            input_data=filename,
+            input_data=filename,          
+            original_filename=original_filename, 
             prediction=activity,
             confidence=confidence,
-            person_count=1,  # MediaPipe single-pose
+            person_count=1,
             fps=round(fps, 2),
             latency=round(total_latency, 2),
             keypoints=keypoints_json
         )
         pred = create_prediction(db=db, prediction=pred_in)
         
-        print(f"✅ Prediction: {activity} | Confidence: {confidence*100:.1f}% | FPS: {fps:.1f} | Latency: {total_latency:.0f}ms")
+        print(f"✅ Prediction: {activity} | Original: {original_filename} | FPS: {fps:.1f}")
         
         # Return prediction result
         return PredictionOut(
             id=pred.id,
             input_data=pred.input_data,
+            original_filename=pred.original_filename, # NEW
             prediction=pred.prediction,
             confidence=pred.confidence,
             person_count=pred.person_count,

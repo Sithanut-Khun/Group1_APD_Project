@@ -7,6 +7,7 @@ class Prediction(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     input_data = Column(String)
+    original_filename = Column(String)
     prediction = Column(String)
     confidence = Column(Float)
     person_count = Column(Integer, default=0)
