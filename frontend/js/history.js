@@ -173,6 +173,8 @@ class HistoryManager {
     updateStatistics() {
         const total = this.filteredPredictions.length;
         
+        console.log('📊 Updating statistics for', total, 'filtered records');
+        
         if (total === 0) {
             this.totalRecords.textContent = '0';
             this.avgConfidence.textContent = '0%';
@@ -194,11 +196,17 @@ class HistoryManager {
             ? validLatency.reduce((sum, p) => sum + p.latency, 0) / validLatency.length
             : 0;
         
+        // Set values immediately first, then animate from current value
+        const currentTotal = parseInt(this.totalRecords.textContent) || 0;
+        const currentConf = parseFloat(this.avgConfidence.textContent) || 0;
+        const currentFPS = parseFloat(this.avgFPS.textContent) || 0;
+        const currentLatency = parseFloat(this.avgLatency.textContent) || 0;
+        
         // Update UI with animation
-        this.animateValue(this.totalRecords, 0, total, 500, 0);
-        this.animateValue(this.avgConfidence, 0, avgConf * 100, 500, 1, '%');
-        this.animateValue(this.avgFPS, 0, avgFPSVal, 500, 1);
-        this.animateValue(this.avgLatency, 0, avgLatencyVal, 500, 0, 'ms');
+        this.animateValue(this.totalRecords, currentTotal, total, 500, 0);
+        this.animateValue(this.avgConfidence, currentConf, avgConf * 100, 500, 1, '%');
+        this.animateValue(this.avgFPS, currentFPS, avgFPSVal, 500, 1);
+        this.animateValue(this.avgLatency, currentLatency, avgLatencyVal, 500, 0, 'ms');
     }
     
     animateValue(element, start, end, duration, decimals = 0, suffix = '') {
