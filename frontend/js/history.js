@@ -96,6 +96,7 @@ class HistoryManager {
         
         this.renderTable();
         this.updateRecordCount();
+        this.updateStatistics();
     }
     
     renderTable() {
@@ -170,7 +171,7 @@ class HistoryManager {
     }
     
     updateStatistics() {
-        const total = this.predictions.length;
+        const total = this.filteredPredictions.length;
         
         if (total === 0) {
             this.totalRecords.textContent = '0';
@@ -180,15 +181,15 @@ class HistoryManager {
             return;
         }
         
-        // Calculate averages
-        const avgConf = this.predictions.reduce((sum, p) => sum + p.confidence, 0) / total;
+        // Calculate averages from filtered predictions
+        const avgConf = this.filteredPredictions.reduce((sum, p) => sum + p.confidence, 0) / total;
         
-        const validFPS = this.predictions.filter(p => p.fps !== null && p.fps !== undefined);
+        const validFPS = this.filteredPredictions.filter(p => p.fps !== null && p.fps !== undefined);
         const avgFPSVal = validFPS.length > 0
             ? validFPS.reduce((sum, p) => sum + p.fps, 0) / validFPS.length
             : 0;
         
-        const validLatency = this.predictions.filter(p => p.latency !== null && p.latency !== undefined);
+        const validLatency = this.filteredPredictions.filter(p => p.latency !== null && p.latency !== undefined);
         const avgLatencyVal = validLatency.length > 0
             ? validLatency.reduce((sum, p) => sum + p.latency, 0) / validLatency.length
             : 0;
