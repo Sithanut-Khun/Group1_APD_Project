@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime
-from datetime import datetime
+from datetime import datetime, timezone
 from .database import Base
 
 class Prediction(Base):
@@ -12,4 +12,4 @@ class Prediction(Base):
     person_count = Column(Integer, default=0)
     fps = Column(Float, default=0.0)
     latency = Column(Float, default=0.0)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))

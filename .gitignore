@@ -1,4 +1,3 @@
-# .gitignore
 .venv
 .env
 .env.local
@@ -13,3 +12,11 @@ uploads/
 *.csv
 
 
+
+# SSL Certificates - DO NOT COMMIT
+certbot/
+*.pem
+*.key
+*.crt
+*.csr
+*.cert
