@@ -53,10 +53,18 @@ class HistoryManager {
     }
     
     setupEventListeners() {
-        this.activityFilter.addEventListener('change', () => this.applyFilters());
+        console.log('🔧 Setting up event listeners...');
+        console.log('activityFilter element:', this.activityFilter);
+        
+        this.activityFilter.addEventListener('change', (e) => {
+            console.log('🎯 Activity filter changed to:', e.target.value);
+            this.applyFilters();
+        });
         this.limitFilter.addEventListener('change', () => this.loadHistory());
         this.refreshBtn.addEventListener('click', () => this.loadHistory());
         this.exportBtn.addEventListener('click', () => this.exportToCSV());
+        
+        console.log('✅ Event listeners set up');
     }
     
     async loadHistory() {
