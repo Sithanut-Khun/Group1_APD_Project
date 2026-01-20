@@ -11,7 +11,7 @@ uploads/
 
 *.csv
 
-
+PRESENTATION_DETAILS.md
 
 # SSL Certificates - DO NOT COMMIT
 certbot/
