@@ -702,7 +702,7 @@
                         
                         <div className="tech-stack">
                             {[
-                                {icon: "fa-brain", title: "ML Model", desc: "MediaPipe Pose + YOLOv8", color: "#3498db"},
+                                {icon: "fa-brain", title: "ML Model", desc: "MediaPipe Pose", color: "#3498db"},
                                 {icon: "fa-bolt", title: "API Backend", desc: "FastAPI + Uvicorn", color: "#2ecc71"},
                                 {icon: "fa-database", title: "Database", desc: "PostgreSQL 13", color: "#336791"},
                                 {icon: "fa-code", title: "Frontend", desc: "Vanilla HTML/CSS/JS", color: "#e74c3c"},
@@ -749,11 +749,16 @@
                                     title: "9 Activities",
                                     desc: "Spatial relationship analysis for classification"
                                 },
-                                {
+                                
+                                {                                 
                                     icon: "fa-bolt",
                                     title: "Performance",
-                                    desc: "Real-time inference: 20-25ms latency",
-                                    list: ["85-90% accuracy", "Lightweight model"]
+                                    desc: "Efficient AI processing with real-time capability",
+                                    list: [
+                                        "AI Processing: ~60-100ms",
+                                        "85-90% classification confidence", 
+                                        "Lightweight model (13.7M params)"
+                                    ]
                                 },
                                 {
                                     icon: "fa-code",
@@ -1018,20 +1023,26 @@
                         <h1 className="slide-title">System Performance</h1>
                         <p className="slide-subtitle">Real-time processing metrics and statistics</p>
                         
-                        <div className="stats-grid">
+                     <div className="stats-grid">
                             <div className="stat-card">
+                                <div className="stat-icon">📍</div>
                                 <div className="stat-value">33</div>
-                                <div className="stat-label">Body Landmarks</div>
+                                <div className="stat-label">Landmarks</div>
                             </div>
                             <div className="stat-card">
-                                <div className="stat-value">25ms</div>
-                                <div className="stat-label">Avg Latency</div>
+                                <div className="stat-icon">⚡</div>
+                                <div className="stat-value">400</div>
+                                <div className="stat-label">Average Latency End-to-End Processing</div>
+                                <small className="stat-note">per frame</small>
                             </div>
                             <div className="stat-card">
-                                <div className="stat-value">90%</div>
+                                <div className="stat-icon">🎯</div>
+                                <div className="stat-value">85%+</div>
                                 <div className="stat-label">Accuracy</div>
+                                <small className="stat-note">top activities</small>
                             </div>
                             <div className="stat-card">
+                                <div className="stat-icon">🏃</div>
                                 <div className="stat-value">9</div>
                                 <div className="stat-label">Activities</div>
                             </div>
@@ -1044,8 +1055,9 @@
                                     Processing Speed
                                 </h3>
                                 <p style={{fontSize: '1rem', color: '#555'}}>
-                                    Achieves 40-45 FPS processing on standard hardware with MediaPipe Pose model, 
-                                    making it suitable for real-time applications.
+                                   Achieves 10-15 FPS processing with MediaPipe Pose model, 
+                                   suitable for activity analysis and near-real-time applications.
+                                   Average latency: ~100ms per frame.
                                 </p>
                             </div>
                             
@@ -1136,7 +1148,7 @@
                                 {
                                     icon: "fa-balance-scale",
                                     title: "Model Selection",
-                                    desc: "YOLOv8 was too heavy (500ms latency). Switched to MediaPipe Pose (25ms) with minimal accuracy loss.",
+                                    desc: "YOLOv8 was too heavy (500ms latency). Switched to MediaPipe Pose (100ms) with minimal accuracy loss.",
                                     solution: "Used lightweight MediaPipe model"
                                 },
                                 {
