@@ -688,59 +688,141 @@
     id: 2,
     title: "Project Introduction",
     content: () => (
-        <div className="slide-content" style={{ textAlign: 'center', padding: '20px' }}>
-            {/* Header Section */}
-            <h1 className="slide-title" style={{ fontSize: '2.5rem', marginBottom: '10px' }}>Project Introduction</h1>
-            <p className="slide-subtitle" style={{ color: '#3498db', fontWeight: '600', fontSize: '1.1rem', marginBottom: '40px' }}>
-                NeuralPose — A Production-Ready Human Activity Recognition System
+        <div className="slide-content">
+            <h1 className="slide-title">Project Introduction</h1>
+            <p className="slide-subtitle">
+                NeuralPose - Human Activity Recognition System
             </p>
-
-            {/* Feature Cards Grid */}
-            <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: '1fr 1fr', 
-                gap: '25px', 
-                maxWidth: '900px', 
-                margin: '0 auto',
-                textAlign: 'left' 
-            }}>
-                
-                {/* Card 1: The Goal */}
-                <div style={{ 
-                    padding: '25px', 
-                    borderRadius: '12px', 
-                    background: '#f8fafc', 
-                    border: '1px solid #e2e8f0',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+            
+            <div style={{marginTop: '40px'}}>
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    marginBottom: '40px'
                 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
-                        <div style={{ background: '#3498db', padding: '10px', borderRadius: '8px', marginRight: '15px' }}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
-                        </div>
-                        <h3 style={{ margin: 0, color: '#2c3e50' }}>End-to-End Pipeline</h3>
+                    <div style={{
+                        width: '80px',
+                        height: '80px',
+                        background: 'linear-gradient(135deg, #3498db, #8b5cf6)',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '36px',
+                        color: 'white',
+                        boxShadow: '0 8px 20px rgba(52, 152, 219, 0.3)'
+                    }}>
+                        <i className="fas fa-brain"></i>
                     </div>
-                    <p style={{ color: '#64748b', fontSize: '0.95rem', lineHeight: '1.6', margin: 0 }}>
-                        A complete <strong>machine learning deployment</strong> demonstrating the journey from local model development to a scalable production environment.
+                </div>
+                
+                <div className="feature-item" style={{
+                    marginBottom: '30px', 
+                    background: 'transparent', 
+                    boxShadow: 'none', 
+                    borderLeft: 'none', 
+                    padding: '0',
+                    position: 'relative'
+                }}>
+                    <div style={{
+                        position: 'absolute',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        top: '-20px',
+                        width: '60px',
+                        height: '4px',
+                        background: 'linear-gradient(90deg, #3498db, #8b5cf6)',
+                        borderRadius: '2px'
+                    }}></div>
+                    
+                    <p style={{
+                        fontSize: '1.2rem', 
+                        color: '#555', 
+                        lineHeight: '1.8', 
+                        textAlign: 'center', 
+                        maxWidth: '800px', 
+                        margin: '30px auto 0',
+                        padding: '25px',
+                        background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+                        borderRadius: '12px',
+                        border: '1px solid #e8e8e8',
+                        boxShadow: '0 5px 15px rgba(0, 0, 0, 0.05)'
+                    }}>
+                        NeuralPose is an <strong style={{color: '#3498db'}}>end-to-end machine learning deployment project</strong> that 
+                        demonstrates how to take a computer vision model from development to production.
+                        
+                        <br/><br/>
+                        
+                        We built a full-stack system that detects human poses in real-time and classifies activities, 
+                        deployed with a custom domain, HTTPS, and containerized microservices architecture.
+                        
+                        <br/><br/>
+                        
+                        <span style={{
+                            display: 'inline-block',
+                            padding: '8px 20px',
+                            background: 'linear-gradient(135deg, #3498db, #8b5cf6)',
+                            color: 'white',
+                            borderRadius: '20px',
+                            fontSize: '0.9rem',
+                            fontWeight: '600',
+                            marginTop: '10px'
+                        }}>
+                            <i className="fas fa-check-circle" style={{marginRight: '8px'}}></i>
+                            Complete ML Deployment Pipeline
+                        </span>
                     </p>
                 </div>
-
-                {/* Card 2: Technical Stack */}
-                <div style={{ 
-                    padding: '25px', 
-                    borderRadius: '12px', 
-                    background: '#f8fafc', 
-                    border: '1px solid #e2e8f0',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: '20px',
+                    marginTop: '30px',
+                    flexWrap: 'wrap'
                 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
-                        <div style={{ background: '#2ecc71', padding: '10px', borderRadius: '8px', marginRight: '15px' }}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
-                        </div>
-                        <h3 style={{ margin: 0, color: '#2c3e50' }}>Architecture</h3>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        background: '#e3f2fd',
+                        padding: '8px 16px',
+                        borderRadius: '20px',
+                        fontSize: '0.9rem',
+                        color: '#3498db',
+                        fontWeight: '500'
+                    }}>
+                        <i className="fas fa-eye"></i>
+                        <span>Computer Vision</span>
                     </div>
-                    <p style={{ color: '#64748b', fontSize: '0.95rem', lineHeight: '1.6', margin: 0 }}>
-                        Built as a <strong>full-stack system</strong> utilizing containerized microservices, pose detection, and activity classification.
-                    </p>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        background: '#e3f2fd',
+                        padding: '8px 16px',
+                        borderRadius: '20px',
+                        fontSize: '0.9rem',
+                        color: '#3498db',
+                        fontWeight: '500'
+                    }}>
+                        <i className="fas fa-server"></i>
+                        <span>Real-time API</span>
+                    </div>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        background: '#e3f2fd',
+                        padding: '8px 16px',
+                        borderRadius: '20px',
+                        fontSize: '0.9rem',
+                        color: '#3498db',
+                        fontWeight: '500'
+                    }}>
+                        <i className="fas fa-cloud"></i>
+                        <span>Cloud Deployment</span>
+                    </div>
                 </div>
             </div>
         </div>
